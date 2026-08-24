@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Libera CORS
+  // Libera CORS para a Vercel
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,21 +8,31 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const N8N_URL = process.env.N8N_URL;
   const { path } = req.query;
-  
-  // COLOQUE AQUI A URL PUBLICA DO SEU N8N QUANDO TIVER
-  const N8N_URL = process.env.N8N_URL || 'https://SEU-N8N-AQUI.com/webhook';
+
+  if (!N8N_URL) {
+    return res.status(200).json({ 
+      error: "N8N_URL ainda não configurada na Vercel. Vá em Settings > Environment Variables" 
+    });
+  }
 
   try {
-    const url = `${N8N_URL}/${path}`;
-    const response = await fetch(url, {
+    const targetUrl = `${N8N_URL}/${path}`;
+    const queryString = new URLSearchParams(req.query);
+    queryString.delete('path');
+    
+    const finalUrl = queryString.toString() ? `${targetUrl}?${queryString}` : targetUrl;
+
+    const response = await fetch(finalUrl, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
+      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
     });
-    const data = await response.text();
-    return res.status(response.status).send(data);
-  } catch (e) {
-    return res.status(500).json({ message: 'Erro proxy: ' + e.message });
+
+    const data = await response.json();
+    return res.status(response.status).json(data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 }
