@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitrine de Serviços Comunitários</title>
+  <style>
+    :root { --primary:#1e3a8a; --primary-hover:#1d4ed8; --bg:#f8fafc; --card-bg:#ffffff; --text:#0f172a; --text-muted:#64748b; --border:#e2e8f0; --success:#16a34a; --error:#dc2626; }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+    body{background:var(--bg);color:var(--text);padding-bottom:60px}
+    header{background:var(--primary);color:white;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+    nav button{background:transparent;border:1px solid white;color:white;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;margin-left:0.5rem}
+    nav button:hover{background:white;color:var(--primary)}
+    .container{max-width:1200px;margin:2rem auto;padding:0 1rem}
+    .view-section{display:none}.view-section.active{display:block}
+    .controls{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap}
+    .controls input,.controls select{padding:0.75rem;border:1px solid var(--border);border-radius:6px;flex:1;min-width:200px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+    .card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between}
+    .card-category{font-size:0.8rem;text-transform:uppercase;color:var(--primary);font-weight:bold;margin-bottom:0.5rem}
+    .card-title{font-size:1.25rem;font-weight:600;margin-bottom:0.5rem}
+    .card-desc{color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem;flex-grow:1}
+    .card-price{font-size:1.1rem;font-weight:bold;color:var(--success);margin-bottom:1rem}
+    .form-container{max-width:450px;margin:0 auto;background:white;padding:2rem;border-radius:8px;border:1px solid var(--border)}
+    .form-group{margin-bottom:1.2rem}.form-group label{display:block;margin-bottom:0.4rem;font-weight:500}
+    .form-group input{width:100%;padding:0.75rem;border:1px solid var(--border);border-radius:6px}
+    .btn-submit{width:100%;padding:0.75rem;background:var(--primary);color:white;border:none;border-radius:6px;font-weight:bold;cursor:pointer}
+    .spinner{display:none;border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:2rem auto}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    .message{padding:1rem;border-radius:6px;margin-bottom:1rem;display:none}
+    .message.error{background:#fee2e2;color:var(--error)}.message.success{background:#dcfce7;color:var(--success)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vitrine Comunitária</h1>
+    <nav>
+      <button onclick="switchView('vitrine')">Início (Serviços)</button>
+      <button onclick="switchView('precadastro')">Seja um Prestador</button>
+      <button onclick="switchView('login')">Área Restrita</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div id="feedback-msg" class="message"></div>
+    <div id="loading" class="spinner"></div>
+
+    <section id="view-vitrine" class="view-section active">
+      <div class="controls">
+        <input type="text" id="search-input" placeholder="Buscar por serviço ou descrição..." oninput="filterServices()">
+        <select id="category-filter" onchange="filterServices()">
+          <option value="">Carregando categorias...</option>
+        </select>
+      </div>
+      <div id="services-grid" class="grid"></div>
+    </section>
+
+    <section id="view-precadastro" class="view-section">
+      <div class="form-container">
+        <h2 style="text-align:center;margin-bottom:1.5rem;">Pré-Cadastro de Prestador</h2>
+        <form id="form-precadastro" onsubmit="handlePreCadastro(event)">
+          <div class="form-group"><label>Nome Completo *</label><input type="text" id="pre-nome" required></div>
+          <div class="form-group"><label>E-mail *</label><input type="email" id="pre-email" required></div>
+          <div class="form-group"><label>Telefone *</label><input type="tel" id="pre-telefone" required></div>
+          <div class="form-group"><label>Senha *</label><input type="password" id="pre-senha" required></div>
+          <button type="submit" class="btn-submit">Enviar Cadastro</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="view-login" class="view-section">
+      <div class="form-container">
+        <h2 style="text-align:center;margin-bottom:1.5rem;">Acesso do Prestador</h2>
+        <form id="form-login" onsubmit="handleLogin(event)">
+          <div class="form-group"><label>E-mail / Login *</label><input type="text" id="login-user" required></div>
+          <div class="form-group"><label>Senha *</label><input type="password" id="login-pass" required></div>
+          <button type="submit" class="btn-submit">Entrar</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="view-dashboard" class="view-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <h2>Meus Serviços</h2><button onclick="logout()" style="padding:0.5rem 1rem;background:#dc2626;color:white;border:none;border-radius:4px;cursor:pointer;">Sair</button>
+      </div>
+      <div id="prestador-info" style="margin-bottom:1.5rem;padding:1rem;background:#e0f2fe;border-radius:6px;"></div>
+      <div id="my-services-grid" class="grid"></div>
+    </section>
+  </div>
+
+<script>
+  // === TROQUE AQUI DEPOIS QUE SEU N8N ESTIVER PUBLICO ===
+  const N8N_BASE_URL = 'https://SEU-N8N-PUBLICO.com/webhook';
+  const ENDPOINTS = {
+    categorias: `${N8N_BASE_URL}/categorias`,
+    vitrine: `${N8N_BASE_URL}/servicos`,
+    login: `${N8N_BASE_URL}/login`,
+    precadastro: `${N8N_BASE_URL}/precadastro`
+  };
+
+  let allServices = [];
+  document.addEventListener('DOMContentLoaded', () => { loadCategorias(); loadVitrine(); });
+
+  function showLoading(show){ document.getElementById('loading').style.display = show ? 'block' : 'none'; }
+  function showMessage(msg, type='error'){ const el=document.getElementById('feedback-msg'); el.className=`message ${type}`; el.innerText=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',5000); }
+  function switchView(v){ document.querySelectorAll('.view-section').forEach(el=>el.classList.remove('active')); document.getElementById(`view-${v}`).classList.add('active'); }
+
+  async function loadCategorias(){
+    const select=document.getElementById('category-filter');
+    try{
+      const res=await fetch(ENDPOINTS.categorias);
+      if(!res.ok) throw new Error('falha');
+      const data=await res.json();
+      const lista=data.categorias || data;
+      select.innerHTML='<option value="">Todas as Categorias</option>';
+      lista.forEach(cat=>{ if(!cat) return; const opt=document.createElement('option'); opt.value=cat; opt.textContent=cat; select.appendChild(opt); });
+    }catch(e){ console.warn('fallback categorias',e); select.innerHTML='<option value="">Todas as Categorias</option>'; }
+  }
+
+  async function loadVitrine(){
+    showLoading(true);
+    try{
+      const res=await fetch(ENDPOINTS.vitrine);
+      if(!res.ok) throw new Error('Falha ao carregar. Libere CORS no n8n: Access-Control-Allow-Origin = *');
+      allServices=await res.json();
+      if(document.getElementById('category-filter').options.length<=1) populateCategories(allServices);
+      renderServices(allServices,'services-grid');
+    }catch(err){ showMessage(err.message); } finally{ showLoading(false); }
+  }
+
+  function populateCategories(services){
+    const cats=[...new Set(services.map(s=>s.Categoria||s.categoria).filter(Boolean))];
+    const sel=document.getElementById('category-filter');
+    sel.innerHTML='<option value="">Todas as Categorias</option>';
+    cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+  }
+
+  function renderServices(services,target){
+    const grid=document.getElementById(target); grid.innerHTML='';
+    if(!services||!services.length){ grid.innerHTML='<p style="grid-column:1/-1;text-align:center;">Nenhum serviço</p>'; return; }
+    services.forEach(s=>{
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML=`<div><div class="card-category">${s.Categoria||s.categoria||'Geral'}</div><div class="card-title">${s['Nome do Serviço']||s.nome||''}</div><div class="card-desc">${s['Descrição']||s.descricao||''}</div></div><div><div class="card-price">${s['Preço/Orçamento']||s.preco||''}</div></div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  function filterServices(){
+    const t=document.getElementById('search-input').value.toLowerCase();
+    const c=document.getElementById('category-filter').value;
+    const f=allServices.filter(s=>{ const n=(s['Nome do Serviço']||'').toLowerCase(); const d=(s['Descrição']||'').toLowerCase(); return (n.includes(t)||d.includes(t))&&(c===''||s.Categoria===c); });
+    renderServices(f,'services-grid');
+  }
+
+  async function handlePreCadastro(e){
+    e.preventDefault(); showLoading(true);
+    const payload={ nome:document.getElementById('pre-nome').value, email:document.getElementById('pre-email').value, telefone:document.getElementById('pre-telefone').value, senha:document.getElementById('pre-senha').value };
+    try{
+      const r=await fetch(ENDPOINTS.precadastro,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d=await r.json(); if(!r.ok) throw new Error(d.message); showMessage('Pré-cadastro OK!','success'); switchView('vitrine');
+    }catch(err){ showMessage(err.message); } finally{ showLoading(false); }
+  }
+
+  async function handleLogin(e){
+    e.preventDefault(); showLoading(true);
+    const payload={ login:document.getElementById('login-user').value, senha:document.getElementById('login-pass').value };
+    try{
+      const r=await fetch(ENDPOINTS.login,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d=await r.json(); if(!r.ok) throw new Error(d.message);
+      document.getElementById('prestador-info').innerHTML=`<strong>${d.prestador.Nome}</strong> - ${d.prestador.Matricula}`;
+      renderServices(d.servicos,'my-services-grid'); switchView('dashboard');
+    }catch(err){ showMessage(err.message); } finally{ showLoading(false); }
+  }
+  function logout(){ switchView('vitrine'); showMessage('Saiu','success'); }
+</script>
+</body>
+</html>
