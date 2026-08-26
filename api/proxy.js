@@ -14,6 +14,8 @@ export default async function handler(req, res) {
   try {
     const queryString = new URLSearchParams(req.query);
     queryString.delete('path');
+    
+    // Monta a URL final: https://n8n-production-xyz.up.railway.app/webhook/pre-cadastro-prestador
     const targetUrl = `${N8N_URL.replace(/\/$/, '')}/${path}`;
     const finalUrl = queryString.toString() ? `${targetUrl}?${queryString}` : targetUrl;
 
@@ -26,6 +28,7 @@ export default async function handler(req, res) {
     const text = await response.text();
     let data;
     try { data = JSON.parse(text); } catch { data = { raw: text }; }
+    
     return res.status(response.status).json(data);
   } catch (error) {
     return res.status(500).json({ error: error.message });
