@@ -1,0 +1,801 @@
+{
+  "name": "02. Onboarding Tomador",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pre-cadastro-tomador",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "48fb6a62-d520-4678-8c34-af67b23db318",
+      "name": "Webhook - Pre-Cadastro",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        48,
+        592
+      ],
+      "webhookId": "pre-cadastro-Tomador"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Tomador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 37419142,
+          "mode": "list",
+          "cachedResultName": "Pré-Cadastro Tomador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=37419142"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome Completo": "={{ $json.body.Nome }}",
+            "e-mail Tomador": "={{ $json.body.Email }}",
+            "Telefone": "={{ $json.body.Telefone }}",
+            "Senha": "={{ $json.body.Senha }}",
+            "Token Hash": "={{ $json['Token Hash'] }}",
+            "Token Expiração": "={{ $json['Token Expiração'] }}",
+            "Status": "={{ $json.Status }}",
+            "Data Pré-Cadastro": "={{ $json['Data Pre-Cadastro'] }}",
+            "IP Origem": "={{ $('Webhook - Pre-Cadastro').item.json.headers['x-real-ip'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nome Completo",
+              "displayName": "Nome Completo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "e-mail Tomador",
+              "displayName": "e-mail Tomador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Senha",
+              "displayName": "Senha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Token Hash",
+              "displayName": "Token Hash",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Token Expiração",
+              "displayName": "Token Expiração",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data Pré-Cadastro",
+              "displayName": "Data Pré-Cadastro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IP Origem",
+              "displayName": "IP Origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e02628ce-70b3-4452-9b4b-83b66d30ecbc",
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        1328,
+        784
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['e-mail Tomador'] }}",
+        "subject": "Confirme seu e-mail - Vitrine Comunitária 💚",
+        "message": "=Olá, <strong>{{ $json['Nome Completo'] }}</strong>! 👋\n\n<a href=\"https://primary-production-fd9ff.up.railway.app/webhook/confirma?email={{ $json['e-mail Tomador'] }}&token={{ $json['Token Hash'] }}\">✅ Confirmar meu e-mail</a>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        784
+      ],
+      "id": "3d1d606b-a111-4739-ab5f-bf6208d9998b",
+      "name": "Send a message",
+      "webhookId": "f0eec6db-739d-4e9f-8b1b-69c68b59008e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hqxlW3oWiV2DZSwq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Tomador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cadastro de Tomador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "e-mail Tomador",
+              "lookupValue": "={{ $('Webhook - Pre-Cadastro').item.json.body.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "789bf4ed-4bda-4f98-9d56-27e012462de7",
+      "name": "Busca Email Cadastro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        704
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "erro"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "1b41845e-329a-4462-afa2-444c68c348dd",
+              "leftValue": "={{ $('Webhook - Pre-Cadastro').item.json.body.Email }}",
+              "rightValue": "={{ $json['e-mail Tomador'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a3893fd9-d84c-473c-bd44-ce34c7ff1092",
+      "name": "e-mail Pré-Cadastrado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        448,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Tomador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 37419142,
+          "mode": "list",
+          "cachedResultName": "Pré-Cadastro Tomador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=37419142"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "e-mail Tomador",
+              "lookupValue": "={{ $json.body.Email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c15647bd-1266-4655-8a68-f636c22001d8",
+      "name": "Busca Email Pré-Cadastro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        592
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "notes": "erro"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Tomador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 37419142,
+          "mode": "list",
+          "cachedResultName": "Pré-Cadastro Tomador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=37419142"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "e-mail Tomador": "={{ $('Webhook - Pre-Cadastro').item.json.body.Email }}",
+            "Nome Completo": "={{ $('Webhook - Pre-Cadastro').item.json.body.Nome }}",
+            "Telefone": "={{ $('Webhook - Pre-Cadastro').item.json.body.Telefone }}",
+            "Senha": "={{ $('Webhook - Pre-Cadastro').item.json.body.Senha }}",
+            "Status": "Pendente",
+            "IP Origem": "={{ $('Webhook - Pre-Cadastro').item.json.headers['x-real-ip'] }}",
+            "Data Pré-Cadastro": "={{ $now.toString() }}",
+            "Token Expiração": "={{ $now.plus({hours: 24}).toString() }} "
+          },
+          "matchingColumns": [
+            "e-mail Tomador"
+          ],
+          "schema": [
+            {
+              "id": "Nome Completo",
+              "displayName": "Nome Completo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "e-mail Tomador",
+              "displayName": "e-mail Tomador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telefone",
+              "displayName": "Telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Senha",
+              "displayName": "Senha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Token Hash",
+              "displayName": "Token Hash",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Token Expiração",
+              "displayName": "Token Expiração",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data Pré-Cadastro",
+              "displayName": "Data Pré-Cadastro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IP Origem",
+              "displayName": "IP Origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b656aba8-90c0-46b9-b1bd-fb9b4b272a16",
+      "name": "Autaliza Pré-Cadastro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        688,
+        464
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        464
+      ],
+      "id": "465ecc67-518d-478c-a42a-ee19d549f4a4",
+      "name": "Finaliza Fluxo-1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        608
+      ],
+      "id": "8d72fa68-b42f-427d-9591-a23dc3fba74f",
+      "name": "Finaliza Fluxo-2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "1b41845e-329a-4462-afa2-444c68c348dd",
+              "leftValue": "={{ $('Webhook - Pre-Cadastro').item.json.body.Email }}",
+              "rightValue": "={{ $json['e-mail Tomador'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7934c49e-6c65-493f-b4d0-2a221c296732",
+      "name": "e-mail Cadastrado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        880,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['e-mail Tomador'] }}",
+        "subject": "Pré-Cadastro Atualizado - Vitrine Comunitária 💚",
+        "message": "=Olá, <strong>{{ $json['Nome Completo'] }}</strong>! 👋\n\n<p>\nInformams que seus dados do Pré-cadastro foram atualizado, embora seu statupermanece{{ $json.Status }}. \n</p>\n\n<br>\n\n<a href=\"https://primary-production-fd9ff.up.railway.app/webhook/confirma?email={{ $json['e-mail Tomador'] }}&token={{ $json['Token Hash'] }}\">✅ Confirmar meu e-mail</a>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        464
+      ],
+      "id": "d27217d7-5fa0-4665-8566-17d62a69ed43",
+      "name": "Send a message1",
+      "webhookId": "f0eec6db-739d-4e9f-8b1b-69c68b59008e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hqxlW3oWiV2DZSwq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 🛡️ FLUXO: PRÉ-CADASTRO TOMADOR\n\n**Objetivo:** Cadastrar pré-tomador com validação de e-mail e anti-duplicação.\n\n**Ordem Inteligente:**\n1. Verifica se já tem Pré-cadastro (90% dos repetidos)\n2. Se não tiver, verifica se já é CADASTRADO definitivo\n3. Se não tiver em nenhum, cria novo.\n\n**Entrada:** Webhook POST com { nome, email, whatsapp, senha }",
+        "height": 356,
+        "width": 380,
+        "color": 5
+      },
+      "id": "05fe704a-e2a0-4560-b363-d3f579d33308",
+      "name": "📌 Visão Geral",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🔄 REGRA ANTI-DUPLICAÇÃO\n\n**Problema resolvido:** Evitar 10 linhas com mesmo e-mail.\n\n**Ramo TRUE (Já tem pré):**\n-> Google Sheets UPDATE (renova Token Hash + Token Expiração + Data)\n-> Reenvia e-mail de confirmação\n-> Finaliza\n\n**Ramo FALSE (Não tem pré):**\n-> Checa Cadastro Definitivo\n-> Se não tem em nenhum: APPEND novo\n\n**IMPORTANTE:** Lookup deve buscar pela coluna 'Email' EXATA.",
+        "height": 416,
+        "width": 400,
+        "color": "#D0E5E7"
+      },
+      "id": "d4321536-706a-47c4-9aeb-bddccd9a1194",
+      "name": "📌 Anti-Duplicação",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 📊 PLANILHA: Pré-Cadastro Tomador\n\n**Colunas obrigatórias:**\n- Nome = body.nome\n- Email = body.email\n- Telefone = body.whatsapp\n- Senha = body.senha\n- Token Hash = $randomString(32)\n- Token Expiração = $now.plus({hours:24})\n- Status = 'Pendente' (vira ATIVO após confirma)\n- Data Pre-Cadastro = $now\n- IP Origem = headers['x-real-ip']\n\n**País Origem:** Removido na V1 (fixo BR). V2 com ipapi.co",
+        "height": 396,
+        "width": 400,
+        "color": "#D3FB09"
+      },
+      "id": "2da83112-41e0-4910-bb50-bd05d7278ca9",
+      "name": "📌 Planilha Pré-Cadastro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        816,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ✅ TESTES FINAIS (Amanhã com café)\n\n1. E-mail NOVO -> Deve fazer APPEND + enviar e-mail com link ?email=...&token=...\n2. Mesmo e-mail de novo -> Deve fazer UPDATE (não APPEND) + reenviar e-mail\n3. E-mail já em Cadastro Tomador -> Deve finalizar sem fazer nada (ou msg 'já cadastrado')\n\n**Check do link:** No Gmail, passar mouse no botão. Não pode estar vazio.",
+        "height": 252,
+        "width": 400,
+        "color": "#F1B1B1"
+      },
+      "id": "59600ee1-512c-4364-8c58-11d850954eb2",
+      "name": "📌 Testes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "{\n\"Nome\": \"Anônio Marcos\",\n\"Email\":\"vitrinecomunitaria@gmail.com\",\n\"Telefone\": \"552199999-9999\",\n\"Senha\": \"XGt5%6\"\n}",
+        "height": 240,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -288,
+        528
+      ],
+      "typeVersion": 1,
+      "id": "8bdf2370-0dee-47a5-8399-18dbce7c355f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7e635803-2d87-4415-89a6-bdc7d3b73e09",
+              "name": "body.Nome",
+              "value": "={{ $('Webhook - Pre-Cadastro').item.json.body.Nome }}",
+              "type": "string"
+            },
+            {
+              "id": "6b81ae19-9aab-44f7-adc4-e2d8878fca01",
+              "name": "body.Email",
+              "value": "={{ $('Webhook - Pre-Cadastro').item.json.body.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "b733c6db-abc6-4e68-893d-c69acde817ec",
+              "name": "body.Telefone",
+              "value": "={{ $('Webhook - Pre-Cadastro').item.json.body.Telefone }}",
+              "type": "string"
+            },
+            {
+              "id": "2a2cd268-553c-4bd2-9d97-4fa5c5c99db3",
+              "name": "body.Senha",
+              "value": "={{ $('Webhook - Pre-Cadastro').item.json.body.Senha }}",
+              "type": "string"
+            },
+            {
+              "id": "e099ed6d-97e3-4bc7-abc7-a30a42bc8021",
+              "name": "Token Hash",
+              "value": "@apos0!0akjs!!!",
+              "type": "string"
+            },
+            {
+              "id": "00f866e6-6afc-4cea-aeb8-32ca23011279",
+              "name": "Token Expiração",
+              "value": "={{ $now.plus({hours: 24}).toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "30a1dea8-3c78-460f-87e7-3d9c9955635f",
+              "name": "Status",
+              "value": "Pendente",
+              "type": "string"
+            },
+            {
+              "id": "59df3641-a5e5-4357-bc52-8b2997b2e450",
+              "name": "Data Pre-Cadastro",
+              "value": "={{ $now.toString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1088,
+        784
+      ],
+      "id": "8f47fd4a-576c-457a-beed-65a50bc5061e",
+      "name": "Set - Gera Campos"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Pre-Cadastro": {
+      "main": [
+        [
+          {
+            "node": "Busca Email Pré-Cadastro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Email Cadastro": {
+      "main": [
+        [
+          {
+            "node": "e-mail Cadastrado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "e-mail Pré-Cadastrado?": {
+      "main": [
+        [
+          {
+            "node": "Autaliza Pré-Cadastro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Busca Email Cadastro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Email Pré-Cadastro": {
+      "main": [
+        [
+          {
+            "node": "e-mail Pré-Cadastrado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Autaliza Pré-Cadastro": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "e-mail Cadastrado?": {
+      "main": [
+        [
+          {
+            "node": "Finaliza Fluxo-2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set - Gera Campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Finaliza Fluxo-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Gera Campos": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f1fd42dc-88ef-4c4d-90dc-d9d5f90d67f9",
+  "meta": {
+    "instanceId": "ebccf7e04d99964079397326356fa694294e07d4cd866e1203ef0cb7366e0ed3"
+  },
+  "nodeGroups": [],
+  "id": "h6ZwGIe6NGAfCa3A",
+  "tags": []
+}
