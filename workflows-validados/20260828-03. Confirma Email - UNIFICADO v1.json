@@ -1,0 +1,726 @@
+{
+  "name": "03. Confirma Email - UNIFICADO",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "confirma",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1296,
+        -64
+      ],
+      "id": "402ca9ec-ae14-4109-b866-258aa4da7e7b",
+      "name": "Confirmar e-mail",
+      "webhookId": "8cc53ac3-6f2c-4299-8a43-5ab09399f88b"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o token que vem em ?token=XXXX da URL\nconst input = $input.first().json;\nconst token = (input.query?.token || input.query?.Token || input.token || '').toString().trim();\n\nif (!token) {\n  throw new Error('Nenhum token na URL. Teste com ?token=SEU_TOKEN_PURO');\n}\n\nreturn [{\n  json: {\n    token: token\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1072,
+        -64
+      ],
+      "id": "09ffc9fc-272e-4ce2-8784-f177b2fc5d42",
+      "name": "Limpa token"
+    },
+    {
+      "parameters": {
+        "value": "={{ $json.token }}",
+        "dataPropertyName": "tokenHash"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        -64
+      ],
+      "id": "cb0284be-3636-46dc-a70f-bb08a265fd15",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Prestador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 775029241,
+          "mode": "list",
+          "cachedResultName": "Pré-Cadastro Prestador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=775029241"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Token Hash",
+              "lookupValue": "={{ $json.tokenHash }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -656,
+        -160
+      ],
+      "id": "aaca39e5-6ae3-4418-8aee-9d006d426eca",
+      "name": "Buscar Token Hash Prestador",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Prestador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 37419142,
+          "mode": "list",
+          "cachedResultName": "Pré-Cadastro Tomador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=37419142"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Token Hash",
+              "lookupValue": "={{ $json.tokenHash }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -656,
+        48
+      ],
+      "id": "f4f56d12-7025-4cbf-9816-85eec6216cd7",
+      "name": "Buscar Token Hash Tomador",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Prestador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Cadastro de Prestador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome Completo": "={{ $json['Nome Completo'] }}",
+            "e-mail Prestador": "={{ $json['e-mail Prestador'] }}",
+            "Status": "Ativo",
+            "IP Origem": "={{ $('Confirmar e-mail').item.json.headers['x-real-ip'] }}",
+            "Telefone Celular": "={{ $json.Telefone }}",
+            "Senha Hash": "={{ $json.Senha }}",
+            "Data Cadastro": "=  {{ new Date().toISOString() }}",
+            "Última Atualização": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "Token Hash"
+          ],
+          "schema": [
+            {
+              "id": "Nome Completo",
+              "displayName": "Nome Completo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "e-mail Prestador",
+              "displayName": "e-mail Prestador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telefone Celular",
+              "displayName": "Telefone Celular",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Senha Hash",
+              "displayName": "Senha Hash",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "WhatsApp",
+              "displayName": "WhatsApp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telegram",
+              "displayName": "Telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn",
+              "displayName": "LinkedIn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Data Cadastro",
+              "displayName": "Data Cadastro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Última Atualização",
+              "displayName": "Última Atualização",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "País Origem",
+              "displayName": "País Origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "IP Origem",
+              "displayName": "IP Origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -208,
+        -320
+      ],
+      "id": "adc0e93a-b1c6-48c1-bc34-a5e971b72873",
+      "name": "Cadastrar Prestador",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98",
+          "mode": "list",
+          "cachedResultName": "Prestador de Serviços - Base de Dados",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 22486795,
+          "mode": "list",
+          "cachedResultName": "Cadastro Tomador",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Wld86e61pv6_MQgvu_rsNwXmvVyAOXHVwn5iW3Q2-98/edit#gid=22486795"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome Completo": "=",
+            "Status": "Ativo",
+            "Telefone Celular": "={{ $json.Telefone }}",
+            "Senha Hash": "={{ $json.Senha }}",
+            "Data Cadastro": "=  {{ new Date().toISOString() }}",
+            "Última Atualização": "={{ new Date().toISOString() }}"
+          },
+          "matchingColumns": [
+            "Token Hash"
+          ],
+          "schema": [
+            {
+              "id": "Nome Completo",
+              "displayName": "Nome Completo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "e-mail Tomador",
+              "displayName": "e-mail Tomador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telefone Celular",
+              "displayName": "Telefone Celular",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Login",
+              "displayName": "Login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Senha Hash",
+              "displayName": "Senha Hash",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "WhatsApp",
+              "displayName": "WhatsApp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Telegram",
+              "displayName": "Telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn",
+              "displayName": "LinkedIn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Data Cadastro",
+              "displayName": "Data Cadastro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Última Atualização",
+              "displayName": "Última Atualização",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -208,
+        144
+      ],
+      "id": "e2f9d4d9-8551-4561-a3af-2f9c5aa295d7",
+      "name": "Cadastrar Tomador",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "9BTZwhJwAKFN0ZZA",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Possibilidades do tokenhash não ser encontrado:\n\n1. Link já usado - o cara clicou 2x e você já apagou/moveu a linha do Pré-Cadastro;\n2. Link expirado - token de 24h/48h que você não validou a data;\n3. Token manipulado - alguém mudou 1 letra no link do Gmail;\n4. Pré-cadastro limpo manualmente na planilha;\n5. Bug antigo - como o seu de antes, com .trim() / hash diferente.\n",
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1488,
+        -512
+      ],
+      "typeVersion": 1,
+      "id": "04694e07-bfbc-4593-9bf3-5af94d9a9125",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bca0e6a5-47b3-444d-a3d5-07b21e915a42",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        -160
+      ],
+      "id": "968e87cb-be62-4278-adcc-494926b52fa3",
+      "name": "Achou Prestador?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bca0e6a5-47b3-444d-a3d5-07b21e915a42",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        48
+      ],
+      "id": "93c22f3a-9c3a-4217-9b19-bd4d2f4c05e5",
+      "name": "Achou Tomador?"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -192,
+        -80
+      ],
+      "id": "675db42c-9ce2-4a6c-b771-315850ca394c",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Confirmar e-mail": {
+      "main": [
+        [
+          {
+            "node": "Limpa token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpa token": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Buscar Token Hash Prestador",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Buscar Token Hash Tomador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Token Hash Prestador": {
+      "main": [
+        [
+          {
+            "node": "Achou Prestador?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Token Hash Tomador": {
+      "main": [
+        [
+          {
+            "node": "Achou Tomador?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cadastrar Tomador": {
+      "main": [
+        []
+      ]
+    },
+    "Achou Prestador?": {
+      "main": [
+        [
+          {
+            "node": "Cadastrar Prestador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Achou Tomador?": {
+      "main": [
+        [
+          {
+            "node": "Cadastrar Tomador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "34f55168-13c1-4b69-aa28-e0de07614d75",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebccf7e04d99964079397326356fa694294e07d4cd866e1203ef0cb7366e0ed3"
+  },
+  "nodeGroups": [],
+  "id": "o9vwBB6MHxQXzVWI",
+  "tags": []
+}
